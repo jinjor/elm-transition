@@ -1,6 +1,10 @@
 # elm-transition
 
+A transition library for Elm
+
 ## Usage
+
+Following the Elm Architecture (+Task)
 
 ### initialize
 
