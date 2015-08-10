@@ -22,7 +22,7 @@ Transition.init 0.5 60 -- time(sec) and fps
 ### view
 
 ```elm
-model.transition.ratio -- from start(0.0) to end(1.0)
+model.ratio -- from start(0.0) to end(1.0)
 ```
 
 ### event
