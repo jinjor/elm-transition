@@ -9,7 +9,7 @@ Following the Elm Architecture (+Task)
 ### initialize
 
 ```elm
-Transition.init 0.5 60
+Transition.init 0.5 60 -- time(sec) and fps
 ```
 
 ### update
@@ -22,11 +22,11 @@ Transition.init 0.5 60
 ### view
 
 ```elm
-model.transition.ratio
+model.transition.ratio -- from start(0.0) to end(1.0)
 ```
 
 ### event
 
 ```elm
-onClick address Transition.toggle
+onClick address Transition.toggle -- start, reverse, toggle
 ```
