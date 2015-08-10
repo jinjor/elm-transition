@@ -1,14 +1,10 @@
 module Transition (Action, init, Model, update, start, reverse, toggle) where
 
-import Html exposing (..)
-import Html.Events exposing (..)
-import Html.Attributes exposing (..)
 import String exposing (..)
-import Signal exposing (..)
+import Signal exposing (Address)
 import Task exposing (..)
 import TaskTutorial exposing (..)
 import Time exposing (..)
-import Debug exposing (..)
 
 type Action = Start | Reverse | Toggle | Next Time Time Bool
 
