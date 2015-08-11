@@ -9,7 +9,7 @@ Following the Elm Architecture (+Task)
 ### initialize
 
 ```elm
-Transition.init 0.5 60 -- time(sec) and fps
+model = Transition.init 0.5 60 -- time(sec) and fps
 ```
 
 ### update
