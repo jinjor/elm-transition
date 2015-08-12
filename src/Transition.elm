@@ -5,75 +5,64 @@ import Signal exposing (Address)
 import Task exposing (..)
 import TaskTutorial exposing (..)
 import Time exposing (..)
+import Effects exposing (..)
 
 type Action = Start | Reverse | Toggle | Next Time Time Bool
 
 type alias Model =
   { duration : Time
-  , fps : Int
   , ratio : Float
   }
 
-init : Time -> Int -> Model
-init duration fps =
+init : Time -> Model
+init duration =
   { duration = duration
-  , fps = fps
   , ratio = 0.0
   }
 
-update : Address Action -> Action -> Model -> (Model, Maybe (Task () ()))
-update address action model =
-  let
-    interval = 1000 / (Basics.toFloat model.fps)
-    sendNext startTime opening =
+update : Action -> Model -> (Model, Effects Action)
+update action model =
+  case action of
+    Start ->
       let
-        sendNext' startTime currentTime opening =
-          afterSleep interval <| Signal.send address (Next startTime currentTime opening)
+        effects =
+          if | model.ratio <= 0 -> Effects.tick (\currentTime -> Next currentTime currentTime True)
+             | otherwise -> Effects.none
       in
-        Just (getCurrentTime `andThen` (\time -> sendNext' (if startTime > 0 then startTime else time) time opening))
-  in
-    case action of
-      Start ->
-        let
-          maybeTask =
-            if | model.ratio <= 0 -> sendNext 0 True
-               | otherwise -> Nothing
-        in
-          (model, maybeTask)
-      Reverse ->
-        let
-          maybeTask =
-            if | model.ratio >= 1 -> sendNext 0 False
-               | otherwise -> Nothing
-        in
-          (model, maybeTask)
-      Toggle ->
-        let
-          maybeTask =
-            if | model.ratio <= 0 -> sendNext 0 True
-               | model.ratio >= 1 -> sendNext 0 False
-               | otherwise -> Nothing
-        in
-          (model, maybeTask)
-      Next startTime currentTime opening ->
-        let
-          maybeTask =
-            if | opening && model.ratio < 1 -> sendNext startTime True
-               | (not opening) && model.ratio > 0 -> sendNext startTime False
-               | otherwise -> Nothing
-
-          newRatio' = Basics.min 1 <| Basics.max 0 <| (currentTime - startTime) / (model.duration * 1000)
-          newRatio = if opening then newRatio' else 1 - newRatio'
-          newModel =
-            { model |
-              ratio <- newRatio
-            }
-        in
-          (newModel, maybeTask)
-
-
-afterSleep : Float -> Task x y -> Task x y
-afterSleep time task = Task.sleep time `andThen` always task
+        (model, effects)
+    Reverse ->
+      let
+        effects =
+          if | model.ratio >= 1 -> Effects.tick (\currentTime -> Next currentTime currentTime False)
+             | otherwise -> Effects.none
+      in
+        (model, effects)
+    Toggle ->
+      let
+        effects =
+          if | model.ratio <= 0 -> Effects.tick (\currentTime -> Next currentTime currentTime True)
+             | model.ratio >= 1 -> Effects.tick (\currentTime -> Next currentTime currentTime False)
+             | otherwise -> Effects.none
+      in
+        (model, effects)
+    Next startTime currentTime opening ->
+      let
+        toNext currentTime = Next startTime currentTime opening
+        effects =
+          if | opening && model.ratio < 1 -> Effects.tick toNext
+             | (not opening) && model.ratio > 0 -> Effects.tick toNext
+             | otherwise -> Effects.none
+        newRatio =
+          let
+            newRatio' = Basics.min 1 <| Basics.max 0 <| (currentTime - startTime) / (model.duration * 1000)
+          in
+            if opening then newRatio' else 1 - newRatio'
+        newModel =
+          { model |
+            ratio <- newRatio
+          }
+      in
+        (newModel, effects)
 
 start : Action
 start = Start

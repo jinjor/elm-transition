@@ -5,37 +5,33 @@ import String exposing (..)
 import Signal exposing (..)
 import Task exposing (..)
 import Transition
+import Effects exposing (..)
+import StartApp
 
-type Action = NoOp | TransitionAction Transition.Action
+type Action
+  = NoOp
+  | TransitionAction Transition.Action
+  
 type alias Model =
   { transition : Transition.Model
   }
 
-init : Model
+init : (Model, Effects Action)
 init =
-  { transition = Transition.init 0.5 60
-  }
+  (,) { transition = Transition.init 0.5
+  } Effects.none
 
-actions : Mailbox Action
-actions = Signal.mailbox NoOp
-
-update : Address Action -> Action -> Model -> (Model, Maybe (Task () ()))
-update address action model =
+update : Action -> Model -> (Model, Effects Action)
+update action model =
   case action of
     TransitionAction action ->
       let
-        (newModel, maybeTask) =
-          Transition.update (forwardTo address TransitionAction) action model.transition
+        (newModel, effects) =
+          Transition.update action model.transition
       in
         (,) { model |
           transition <- newModel
-        } maybeTask
-
-pickTask : Maybe (Task () ()) -> Task () ()
-pickTask maybeTask =
-  case maybeTask of
-    Just task -> task
-    Nothing -> Task.succeed ()
+        } (Effects.map TransitionAction effects)
 
 view : Address Action -> Model -> Html
 view address model =
@@ -49,11 +45,16 @@ view address model =
       ]
       []
 
-state : Signal (Model, Maybe (Task () ()))
-state = foldp (\action (model, _) -> update actions.address action model) (init, Nothing) actions.signal
+app =
+  StartApp.start
+    { init = init
+    , update = update
+    , view = view
+    , inputs = []
+    }
 
-port runState : Signal (Task () ())
-port runState = Signal.map (\(_, maybeTask) -> pickTask maybeTask) state
+port tasks : Signal (Task Never ())
+port tasks = app.tasks
 
 main : Signal Html
-main = Signal.map (\(model, _) -> view actions.address model) state
+main = app.html
