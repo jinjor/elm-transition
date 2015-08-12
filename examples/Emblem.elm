@@ -18,21 +18,21 @@ type Action
 
 type alias Model =
   { transition : Transition.Model
-  , dimemsions : (Int, Int)
+  , dimensions : (Int, Int)
   }
 
 init : (Model, Effects Action)
 init =
   (,) { transition = Transition.init 0.8
-  , dimemsions = (0, 0)
+  , dimensions = (0, 0)
   } Effects.none
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
-    Dimensions dimemsions ->
+    Dimensions dimensions ->
       (,) { model |
-        dimemsions <- dimemsions
+        dimensions <- dimensions
       } Effects.none
     TransitionAction action ->
       let
@@ -44,8 +44,8 @@ update action model =
         } (Effects.map TransitionAction effects)
 
 view : Address Action -> Model -> Html
-view address { transition, dimemsions } =
-  collage (fst dimemsions) (snd dimemsions)
+view address { transition, dimensions } =
+  collage (fst dimensions) (snd dimensions)
     [ square 300
         |> filled (rgba 53 55 55  <|  transition.ratio * 3 - 2)
     , square 100
