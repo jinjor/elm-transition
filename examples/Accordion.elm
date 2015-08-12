@@ -11,7 +11,7 @@ import StartApp
 type Action
   = NoOp
   | TransitionAction Transition.Action
-  
+
 type alias Model =
   { transition : Transition.Model
   }

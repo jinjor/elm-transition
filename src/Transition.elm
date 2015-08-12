@@ -2,8 +2,6 @@ module Transition (Action, init, Model, update, start, reverse, toggle) where
 
 import String exposing (..)
 import Signal exposing (Address)
-import Task exposing (..)
-import TaskTutorial exposing (..)
 import Time exposing (..)
 import Effects exposing (..)
 

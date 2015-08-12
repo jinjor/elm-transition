@@ -4,19 +4,19 @@ A transition library for Elm
 
 ## Usage
 
-Following the Elm Architecture (+Task)
+Just follow the Elm Architecture
 
 ### initialize
 
 ```elm
-model = Transition.init 0.5 60 -- time(sec) and fps
+model = Transition.init 0.5 -- duration(sec)
 ```
 
 ### update
 
 ```elm
-(newModel, maybeTask) =
-  Transition.update address action model
+(newModel, effects) =
+  Transition.update action model
 ```
 
 ### view
