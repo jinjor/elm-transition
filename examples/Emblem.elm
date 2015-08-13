@@ -12,8 +12,7 @@ import StartApp
 import Html exposing (Html)
 
 type Action
-  = NoOp
-  | TransitionAction Transition.Action
+  = TransitionAction Transition.Action
   | Dimensions (Int, Int)
 
 type alias Model =
@@ -45,7 +44,8 @@ update action model =
 
 view : Address Action -> Model -> Html
 view address { transition, dimensions } =
-  collage (fst dimensions) (snd dimensions)
+  -- collage (fst dimensions) (snd dimensions)
+  collage 500 500
     [ square 300
         |> filled (rgba 53 55 55  <|  transition.ratio * 3 - 2)
     , square 100
