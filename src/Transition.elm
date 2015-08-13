@@ -4,6 +4,7 @@ import String exposing (..)
 import Signal exposing (Address)
 import Time exposing (..)
 import Effects exposing (..)
+import Debug exposing (..)
 
 type Action
   = Start Time
@@ -49,7 +50,7 @@ update action model =
       let
         toNext currentTime = Next duration startTime currentTime reverse
         effects =
-          if | (not reverse) && model.ratio < 1 -> Effects.tick toNext
+          if | (not reverse) && newModel.ratio < 1 -> Effects.tick toNext
              | reverse && model.ratio > 0 -> Effects.tick toNext
              | otherwise -> Effects.none
         newRatio =
