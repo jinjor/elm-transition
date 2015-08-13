@@ -23,7 +23,7 @@ type alias Model =
 
 init : (Model, Effects Action)
 init =
-  (,) { transition = Transition.init 0.8
+  (,) { transition = Transition.init
   , dimensions = (0, 0)
   } Effects.none
 
@@ -78,7 +78,7 @@ view address { transition, dimensions } =
         |> filled white
         |> move (-300, 0)
     ]
-    |> clickable (Signal.message (forwardTo address TransitionAction) Transition.toggle)
+    |> clickable (Signal.message (forwardTo address TransitionAction) (Transition.toggle 0.8))
     |> Html.fromElement
 
 app =

@@ -5,56 +5,58 @@ import Signal exposing (Address)
 import Time exposing (..)
 import Effects exposing (..)
 
-type Action = Start | Reverse | Toggle | Next Time Time Bool
+type Action
+  = Start Time
+  | Reverse Time
+  | Toggle Time
+  | Next Time Time Time Bool
 
 type alias Model =
-  { duration : Time
-  , ratio : Float
+  { ratio : Float
   }
 
-init : Time -> Model
-init duration =
-  { duration = duration
-  , ratio = 0.0
+init : Model
+init =
+  { ratio = 0.0
   }
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
-    Start ->
+    Start duration ->
       let
         effects =
-          if | model.ratio <= 0 -> Effects.tick (\currentTime -> Next currentTime currentTime True)
+          if | model.ratio <= 0 -> Effects.tick (\currentTime -> Next duration currentTime currentTime False)
              | otherwise -> Effects.none
       in
         (model, effects)
-    Reverse ->
+    Reverse duration ->
       let
         effects =
-          if | model.ratio >= 1 -> Effects.tick (\currentTime -> Next currentTime currentTime False)
+          if | model.ratio >= 1 -> Effects.tick (\currentTime -> Next duration currentTime currentTime True)
              | otherwise -> Effects.none
       in
         (model, effects)
-    Toggle ->
+    Toggle duration ->
       let
         effects =
-          if | model.ratio <= 0 -> Effects.tick (\currentTime -> Next currentTime currentTime True)
-             | model.ratio >= 1 -> Effects.tick (\currentTime -> Next currentTime currentTime False)
+          if | model.ratio <= 0 -> Effects.tick (\currentTime -> Next duration currentTime currentTime False)
+             | model.ratio >= 1 -> Effects.tick (\currentTime -> Next duration currentTime currentTime True)
              | otherwise -> Effects.none
       in
         (model, effects)
-    Next startTime currentTime opening ->
+    Next duration startTime currentTime reverse ->
       let
-        toNext currentTime = Next startTime currentTime opening
+        toNext currentTime = Next duration startTime currentTime reverse
         effects =
-          if | opening && model.ratio < 1 -> Effects.tick toNext
-             | (not opening) && model.ratio > 0 -> Effects.tick toNext
+          if | (not reverse) && model.ratio < 1 -> Effects.tick toNext
+             | reverse && model.ratio > 0 -> Effects.tick toNext
              | otherwise -> Effects.none
         newRatio =
           let
-            newRatio' = Basics.min 1 <| Basics.max 0 <| (currentTime - startTime) / (model.duration * 1000)
+            newRatio' = Basics.min 1 <| Basics.max 0 <| (currentTime - startTime) / (duration * 1000)
           in
-            if opening then newRatio' else 1 - newRatio'
+            if (not reverse) then newRatio' else 1 - newRatio'
         newModel =
           { model |
             ratio <- newRatio
@@ -62,11 +64,11 @@ update action model =
       in
         (newModel, effects)
 
-start : Action
+start : Float -> Action
 start = Start
 
-reverse : Action
+reverse : Float -> Action
 reverse = Reverse
 
-toggle : Action
+toggle : Float -> Action
 toggle = Toggle

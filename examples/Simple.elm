@@ -12,14 +12,10 @@ type Action
   = NoOp
   | TransitionAction Transition.Action
 
-type alias Model =
-  { transition : Transition.Model
-  }
+type alias Model = Transition.Model
 
 init : (Model, Effects Action)
-init =
-  (,) { transition = Transition.init
-  } Effects.none
+init = (Transition.init, Effects.none)
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -27,23 +23,15 @@ update action model =
     TransitionAction action ->
       let
         (newModel, effects) =
-          Transition.update action model.transition
+          Transition.update action model
       in
-        (,) { model |
-          transition <- newModel
-        } (Effects.map TransitionAction effects)
+        (newModel, Effects.map TransitionAction effects)
 
 view : Address Action -> Model -> Html
 view address model =
-  let
-    height = 100 + 300 * model.transition.ratio
-    styles = [("height", toString height ++ "px"), ("background", "#8da")]
-  in
-    div
-      [ style styles
-      , onClick (forwardTo address TransitionAction) (Transition.toggle 0.5)
-      ]
-      []
+  button
+    [ onClick (forwardTo address TransitionAction) (Transition.toggle 1.0) ]
+    [ model.ratio |> toString |> text ]
 
 app =
   StartApp.start
