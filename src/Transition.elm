@@ -4,7 +4,6 @@ import String exposing (..)
 import Signal exposing (Address)
 import Time exposing (..)
 import Effects exposing (..)
-import Debug exposing (..)
 
 type Action
   = Start Time

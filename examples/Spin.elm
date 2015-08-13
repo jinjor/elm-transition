@@ -8,7 +8,6 @@ import Transition
 import Effects exposing (..)
 import Easing exposing (ease, easeOutBounce, float)
 import StartApp
-import Debug
 
 type Action
   = TransitionAction Transition.Action
