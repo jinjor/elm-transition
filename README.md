@@ -1,15 +1,13 @@
 # elm-transition
 
-A transition library for Elm
+A simple transition library for Elm
 
 ## Usage
 
 Just follow the Elm Architecture.
 
 ```elm
-type Action
-  = NoOp
-  | TransitionAction Transition.Action
+type Action = TransitionAction Transition.Action
 
 type alias Model = Transition.Model
 

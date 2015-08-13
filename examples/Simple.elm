@@ -8,9 +8,7 @@ import Transition
 import Effects exposing (..)
 import StartApp
 
-type Action
-  = NoOp
-  | TransitionAction Transition.Action
+type Action = TransitionAction Transition.Action
 
 type alias Model = Transition.Model
 
